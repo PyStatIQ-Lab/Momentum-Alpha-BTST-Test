@@ -3,12 +3,20 @@ import pandas as pd
 import yfinance as yf
 import datetime
 import numpy as np
-import pandas_ta as ta  # For technical indicators
 
 # Configure Streamlit
 st.set_page_config(layout="wide")
 st.title("📈 BTST Stock Scanner")
 st.caption("Scan for Breakout Stocks with Momentum and Volume Criteria")
+
+# Handle pandas_ta installation
+try:
+    import pandas_ta as ta
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pandas_ta"])
+    import pandas_ta as ta
 
 # Load stock list from Excel
 try:
@@ -189,8 +197,12 @@ if results:
                 'BB Lower': '{:.2f}'
             }
             
-            styled_df = btst_stocks.style.format(format_dict)
-            st.dataframe(styled_df, height=500, use_container_width=True)
+            # Apply formatting
+            for col, fmt in format_dict.items():
+                if col in btst_stocks.columns:
+                    btst_stocks[col] = btst_stocks[col].apply(lambda x: fmt.format(x) if not pd.isna(x) else '')
+            
+            st.dataframe(btst_stocks, height=500, use_container_width=True)
             
             # Export button
             csv = btst_stocks.to_csv(index=False).encode('utf-8')
