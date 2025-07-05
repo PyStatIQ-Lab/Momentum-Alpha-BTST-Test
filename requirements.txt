@@ -3,4 +3,3 @@ pandas
 yfinance
 numpy
 pandas_ta
-pkg_resources
