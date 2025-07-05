@@ -129,7 +129,7 @@ for i, symbol in enumerate(symbols):
     progress_bar.progress((i + 1) / len(symbols), f"Analyzing {symbol}...")
     result = analyze_stock(symbol, analysis_date)
     if result:
-        results.append(result))
+        results.append(result)
 
 # Create results DataFrame
 if results:
