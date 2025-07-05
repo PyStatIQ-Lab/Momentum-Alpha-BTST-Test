@@ -9,7 +9,15 @@ st.set_page_config(layout="wide")
 st.title("📈 BTST Stock Scanner")
 st.caption("Scan for Breakout Stocks with Momentum and Volume Criteria")
 
-# Handle pandas_ta installation
+# Ensure required packages are installed
+try:
+    import pkg_resources
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
+    import pkg_resources
+
 try:
     import pandas_ta as ta
 except ImportError:
@@ -152,7 +160,7 @@ if results:
         (idx_pct_change >= 0)
     )
     
-    btst_stocks = df[btst_criteria]
+    btst_stocks = df[btst_criteria].copy()
     
     # Display results
     st.divider()
@@ -177,6 +185,9 @@ if results:
     with col2:
         st.subheader("BTST Candidates")
         if not btst_stocks.empty:
+            # Create a formatted copy for display
+            display_df = btst_stocks.copy()
+            
             # Format columns
             format_dict = {
                 'Open': '{:.2f}',
@@ -199,10 +210,10 @@ if results:
             
             # Apply formatting
             for col, fmt in format_dict.items():
-                if col in btst_stocks.columns:
-                    btst_stocks[col] = btst_stocks[col].apply(lambda x: fmt.format(x) if not pd.isna(x) else '')
+                if col in display_df.columns:
+                    display_df[col] = display_df[col].apply(lambda x: fmt.format(x) if not pd.isna(x) else '')
             
-            st.dataframe(btst_stocks, height=500, use_container_width=True)
+            st.dataframe(display_df, height=500, use_container_width=True)
             
             # Export button
             csv = btst_stocks.to_csv(index=False).encode('utf-8')
